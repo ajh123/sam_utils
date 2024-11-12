@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sam_utils"
+name = "sam_utilities"
 version = "0.1.0"
 description = "Random python utility methods I've made for myself, but put together in a package. "
 readme = "README.md"
@@ -18,4 +18,4 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/ajh123/sam_utils"
 "Issues" = "https://github.com/ajh123/sam_utils/issues"
-"Documentation" = "https://minersonline.uk/sam_utils"
+"Documentation" = "https://minersonline.uk/sam_utilities"
