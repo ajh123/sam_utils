@@ -4,19 +4,22 @@ def validated_input(res_type: Type, message: str, invalid_message: str = "That o
     '''
     A generic function to validate an input based on a data type.
 
-    This function will catch all ValueErrors thrown by the data types constructor
+    This function will catch all `ValueError`s thrown by the data type's constructor
 
-    :param res_type: Any constructor for any data type, the constructor must take one paramater.
-    :param message: The message to diaplay to the user when they input.
-    :param invalid_message: The message to display when the user inputs an invalid data type.
-    :returns: Returns the user's input casted to the type speficied by `res_type`.
+    Parameters:
+        res_type (Type): Any constructor for any data type, the constructor must take one parameter.
+        message (str): The message to display to the user when they input.
+        invalid_message (str): The message to display when the user inputs an invalid data type.
+
+    Returns:
+        out (Any): Returns the user's input casted to the type specified by `res_type`.
     '''
     ok = False # Variable used to check if the data input is valid
     res = None # The result returned from the function
     while not ok: # Trap the user in a loop until a valid data type is given
         try: # Check for any errors
-            # Retreieve input from the user (and display the message), then cast the result to the given data type.
-            # If casting is unsuccessfull a ValueError would be thrown
+            # Retrieve input from the user (and display the message), then cast the result to the given data type.
+            # If casting is unsuccessful a ValueError would be thrown
             res = res_type(input(message))
             ok = True # If the program gets here it means that no ValueErrors were thrown, so we can assume the casting was ok
         except ValueError:
@@ -31,10 +34,13 @@ def validate_list_input(list: List[str], message: str, invalid_message: str = "T
 
     The function will return the user's input.
 
-    :param list: The list you wish to compare againist.
-    :param message: The message to diaplay to the user when they input.
-    :param invalid_message: The message to display when the user inputs an object thats not in the list.
-    :returns: The object in the list the user choose.
+    Parameters:
+        list (List[str]): The list you wish to compare against.
+        message (str): The message to display to the user when they input.
+        invalid_message (str): The message to display when the user inputs an object that's not in the list.
+    
+    Returns:
+        out (str): The object in the list the user choose.
     '''
 
     ok = False # Variable used to check if the data input is valid

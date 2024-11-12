@@ -16,11 +16,13 @@ def dual_sort(list1: List, list2: List):
         ValueError: If `list1` and `list2` are not of the same length.
 
     Example:
-        >>> list1 = [7, 2, 5, 10]
-        >>> list2 = ['a', 'b', 'c', 'd']
-        >>> dual_sort(list1, list2)
-        >>> print(list1)  # Output: [2, 5, 7, 10]
-        >>> print(list2)  # Output: ['b', 'c', 'a', 'd']
+    ```python
+    list1 = [7, 2, 5, 10]
+    list2 = ['a', 'b', 'c', 'd']
+    dual_sort(list1, list2)
+    print(list1)  # Output: [2, 5, 7, 10]
+    print(list2)  # Output: ['b', 'c', 'a', 'd']
+    ```
     """
     if len(list1) > len(list2):
         raise ValueError("Legnth of `list1` is greater then length of `list2`.")
