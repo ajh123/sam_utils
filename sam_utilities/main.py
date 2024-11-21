@@ -1,10 +1,11 @@
-from typing import Type, List
+from typing import Type, List, Any
 
-def validated_input(res_type: Type, message: str, invalid_message: str = "That object is invalid, please try again."):
+def validated_input(res_type: Type, message: str, invalid_message: str = "That object is invalid, please try again.") -> Any | None:
     '''
-    A generic function to validate an input based on a data type.
+    A generic function to validate user input based on a data type.
 
-    This function will catch all `ValueError`s thrown by the data type's constructor
+    This function will catch all `ValueError`s thrown by the data type's constructor.
+    This function will wait in a loop until user input is correct.
 
     Parameters:
         res_type (Type): Any constructor for any data type, the constructor must take one parameter.
@@ -12,7 +13,7 @@ def validated_input(res_type: Type, message: str, invalid_message: str = "That o
         invalid_message (str): The message to display when the user inputs an invalid data type.
 
     Returns:
-        out (Any): Returns the user's input casted to the type specified by `res_type`.
+        out (Any | None): Returns the user's input casted to the type specified by `res_type`.
     '''
     ok = False # Variable used to check if the data input is valid
     res = None # The result returned from the function
