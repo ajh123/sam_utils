@@ -53,7 +53,7 @@ class Graph:
             r_size = len(right)
             w_size = len(weight)
             if r_size != w_size:
-                raise ValueError("Right node list and weight lits must be same length")
+                raise ValueError("Right node list and weight lists must be same length")
 
         for i in range(0, len(right)):
             node = right[i]
@@ -154,25 +154,25 @@ class Graph:
     
     def dijkstra(self, start: Node, target: Node):
         distances = {}
-        vistited = {}
+        visited = {}
         predecessors = {}
         for node in self.nodes:
             distances[node] = float("inf")
-            vistited[node] = False
+            visited[node] = False
             predecessors[node] = None
         distances[start] = 0
         for _ in range(len(graph.nodes)):
             min_d = float("inf")
             cNode: Optional[Node] = None
             for node in distances:
-                if not vistited[node] and distances[node] < min_d:
+                if not visited[node] and distances[node] < min_d:
                     min_d = distances[node]
                     cNode = node
             if cNode is None or cNode == target:
                 break
-            vistited[cNode] = True
+            visited[cNode] = True
             for node in self.nodes:
-                if node in cNode.all_neighbours() and not vistited[node]:
+                if node in cNode.all_neighbours() and not visited[node]:
                     alt = distances[cNode] + cNode.get_weight_to(node)
                     if alt < distances[node]:
                         distances[node] = alt
@@ -234,12 +234,12 @@ class GraphVisualizer:
                     mid_y = (y1 + y2) / 2
 
                     label = str(link.weight)
-                    lw = len(label) * 16
-                    lsx = mid_x - lw
-                    lex = mid_x + lw 
+                    # lw = len(label) * 16
+                    # lsx = mid_x - lw
+                    # lex = mid_x + lw 
 
 
-                    self.canvas.create_rectangle(lsx, mid_y, lex, mid_y, )
+                    # self.canvas.create_rectangle(lsx, mid_y, lex, mid_y, )
                     self.canvas.create_text(mid_x, mid_y, text=label, fill="red")
 
 
@@ -250,18 +250,18 @@ if __name__ == "__main__":
     Manchester = graph.add_node(Node("Manchester"))
     York = graph.add_node(Node("York"))
     Liverpool = graph.add_node(Node("Liverpool"))
-    Glasgow = graph.add_node(Node("Galsgow"))
-    Southhampton = graph.add_node(Node("Southhampton"))
+    Glasgow = graph.add_node(Node("Glasgow"))
+    Southampton = graph.add_node(Node("Southampton"))
     graph.make_link(London, [Manchester, York, Glasgow], [8, 5, 1])
     graph.make_link(Manchester, [York, Glasgow], [10, 8])
     graph.make_link(York, [London, Liverpool], [1, 5])
     graph.make_link(Liverpool, [Manchester, York, Glasgow], [6, 4, 1])
     graph.make_link(Glasgow, [Liverpool], [10])
-    graph.make_link(London, [Southhampton], [1])
-    graph.make_link(Manchester, [Southhampton], [5])
-    graph.make_link(York, [Southhampton], [3])
-    graph.make_link(Liverpool, [Southhampton], [4])
-    graph.make_link(Glasgow, [Southhampton], [2])
+    graph.make_link(London, [Southampton], [1])
+    graph.make_link(Manchester, [Southampton], [5])
+    graph.make_link(York, [Southampton], [3])
+    graph.make_link(Liverpool, [Southampton], [4])
+    graph.make_link(Glasgow, [Southampton], [2])
 
     print("=== BFS All ===")
     bfs_all = graph.bfs_all(London)
