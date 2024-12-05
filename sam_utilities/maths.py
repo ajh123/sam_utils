@@ -1,3 +1,5 @@
+import math
+
 def is_even(num: int | float):
     """
     Checks if a number is even.
@@ -40,3 +42,20 @@ def is_positive(num: int | float):
         if num > 0:
             return True
     return False
+
+def is_prime(num: int) -> bool:
+    nums = list(range(2, int(math.sqrt(num))))
+    # Iterate all numbers before self
+    for cn in nums:
+        # Check if remainder of self / current number is 0
+        # This means that self cannot be divided by the current number
+        if (num % cn) == 0:
+           return False 
+    return True
+
+if __name__ == "__main__":
+    print(is_prime(1))
+    print(is_prime(6))
+    print(is_prime(7))
+    print(is_prime(10))
+    print(is_prime(11))
