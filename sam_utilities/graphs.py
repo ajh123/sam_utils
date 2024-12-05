@@ -153,38 +153,59 @@ class Graph:
         return None
     
     def dijkstra(self, start: Node, target: Node):
-        distances = {}
-        visited = {}
-        predecessors = {}
+        # Initialize dictionaries to store distances, visited status, and predecessors of each node.
+        distances = {}  # Shortest known distance to each node from the start.
+        visited = {}    # Tracks whether a node has been visited.
+        predecessors = {}  # Stores the preceding node for the shortest path to reconstruct the path later.
+
+        # Initialize all nodes with default values.
         for node in self.nodes:
-            distances[node] = float("inf")
-            visited[node] = False
-            predecessors[node] = None
+            distances[node] = float("inf")  # Set initial distances to infinity (unknown).
+            visited[node] = False           # Mark all nodes as unvisited.
+            predecessors[node] = None       # No predecessors at the start.
+
+        # Set the distance to the start node to 0 since it's the starting point.
         distances[start] = 0
+
+        # Iterate over all nodes to find the shortest path to each.
         for _ in range(len(graph.nodes)):
-            min_d = float("inf")
-            cNode: Optional[Node] = None
+            min_d = float("inf")  # Initialize the minimum distance as infinity.
+            cNode: Optional[Node] = None  # Variable to track the current node with the smallest distance.
+
+            # Find the unvisited node with the smallest known distance.
             for node in distances:
                 if not visited[node] and distances[node] < min_d:
                     min_d = distances[node]
                     cNode = node
+
+            # If no unvisited nodes remain or we've reached the target, exit the loop.
             if cNode is None or cNode == target:
                 break
+
+            # Mark the current node as visited.
             visited[cNode] = True
+
+            # Update distances for all unvisited neighbors of the current node.
             for node in self.nodes:
                 if node in cNode.all_neighbours() and not visited[node]:
+                    # Calculate the alternative distance to the neighbor through the current node.
                     alt = distances[cNode] + cNode.get_weight_to(node)
                     if alt < distances[node]:
+                        # Update the distance and predecessor if the alternative distance is shorter.
                         distances[node] = alt
                         predecessors[node] = cNode
+
+        # Reconstruct the shortest path from the target to the start using predecessors.
         cur = target
         path = []
         while cur is not None:
-            path.insert(0, cur)
-            cur = predecessors[cur]
-            if cur == start:
+            path.insert(0, cur)  # Add the current node to the path.
+            cur = predecessors[cur]  # Move to the predecessor.
+            if cur == start:  # If the start node is reached, add it and stop.
                 path.insert(0, start)
                 break
+
+        # Return the reconstructed path.
         return path
 
 
