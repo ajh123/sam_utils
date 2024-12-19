@@ -1,11 +1,13 @@
 from typing import List, Optional
 import tkinter as tk
-from tkinter import Canvas
+from tkinter import Canvas, Scrollbar
 
 class Node:
-    def __init__(self, name: str):
+    def __init__(self, name: str, pos_x=None, pos_y=None):
         self.name = name
         self.neighbour_links: List['Link'] = []
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
     def __str__(self):
         return self.name
@@ -206,26 +208,37 @@ class Graph:
                 break
 
         # Return the reconstructed path.
-        return path
+        return (path, distances[target])
 
 
 class GraphVisualizer:
-    def __init__(self, graph: Graph):
+    def __init__(self, graph):
         self.graph = graph
         self.node_positions = {}
         self.window = tk.Tk()
         self.window.title("Graph Visualizer")
+
         self.canvas = Canvas(self.window, width=800, height=600, bg="white")
-        self.canvas.pack()
+        self.canvas.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+        self.h_scroll = Scrollbar(self.window, orient=tk.HORIZONTAL, command=self.canvas.xview)
+        self.h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
+        self.v_scroll = Scrollbar(self.window, orient=tk.VERTICAL, command=self.canvas.yview)
+        self.v_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.canvas.configure(xscrollcommand=self.h_scroll.set, yscrollcommand=self.v_scroll.set)
+        self.canvas.bind("<MouseWheel>", self._zoom)
+        self.canvas.bind("<ButtonPress-1>", self._start_pan)
+        self.canvas.bind("<B1-Motion>", self._do_pan)
+
+        self.scale = 1.0
 
     def draw_graph(self):
         self._calculate_positions()
-        self._draw_edges()
-        self._draw_nodes()
+        self._draw_graph()
         self.window.mainloop()
 
     def _calculate_positions(self):
-        # Simple circular layout for nodes
         import math
         radius = 200
         center_x = 400
@@ -235,9 +248,17 @@ class GraphVisualizer:
 
         for i, node in enumerate(self.graph.nodes):
             angle = i * angle_step
-            x = center_x + radius * math.cos(angle)
-            y = center_y + radius * math.sin(angle)
-            self.node_positions[node] = (x, y)
+            if node.pos_x is None and node.pos_y is None:
+                x = center_x + radius * math.cos(angle)
+                y = center_y + radius * math.sin(angle)
+                self.node_positions[node] = (x, y)
+            else:
+                self.node_positions[node] = (node.pos_x, -node.pos_y)
+
+    def _draw_graph(self):
+        self.canvas.delete("all")
+        self._draw_edges()
+        self._draw_nodes()
 
     def _draw_nodes(self):
         for node, (x, y) in self.node_positions.items():
@@ -253,57 +274,80 @@ class GraphVisualizer:
                 if isinstance(link, WeightedLink):
                     mid_x = (x1 + x2) / 2
                     mid_y = (y1 + y2) / 2
+                    self.canvas.create_text(mid_x, mid_y, text=str(link.weight), fill="red")
 
-                    label = str(link.weight)
-                    # lw = len(label) * 16
-                    # lsx = mid_x - lw
-                    # lex = mid_x + lw 
+    def _zoom(self, event):
+        factor = 1.1 if event.delta > 0 else 0.9
+        self.scale *= factor
+        for node in self.node_positions:
+            x, y = self.node_positions[node]
+            self.node_positions[node] = (x * factor, y * factor)
+        self._draw_graph()
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+    def _start_pan(self, event):
+        self.canvas.scan_mark(event.x, event.y)
 
-                    # self.canvas.create_rectangle(lsx, mid_y, lex, mid_y, )
-                    self.canvas.create_text(mid_x, mid_y, text=label, fill="red")
+    def _do_pan(self, event):
+        self.canvas.scan_dragto(event.x, event.y, gain=1)
 
 
 
 if __name__ == "__main__":
     graph = Graph()
-    London = graph.add_node(Node("London"))
-    Manchester = graph.add_node(Node("Manchester"))
-    York = graph.add_node(Node("York"))
-    Liverpool = graph.add_node(Node("Liverpool"))
-    Glasgow = graph.add_node(Node("Glasgow"))
-    Southampton = graph.add_node(Node("Southampton"))
-    graph.make_link(London, [Manchester, York, Glasgow], [8, 5, 1])
-    graph.make_link(Manchester, [York, Glasgow], [10, 8])
-    graph.make_link(York, [London, Liverpool], [1, 5])
-    graph.make_link(Liverpool, [Manchester, York, Glasgow], [6, 4, 1])
-    graph.make_link(Glasgow, [Liverpool], [10])
-    graph.make_link(London, [Southampton], [1])
-    graph.make_link(Manchester, [Southampton], [5])
-    graph.make_link(York, [Southampton], [3])
-    graph.make_link(Liverpool, [Southampton], [4])
-    graph.make_link(Glasgow, [Southampton], [2])
+    London = graph.add_node(Node("London", -0.118092, 51.509865))
+    Manchester = graph.add_node(Node("Manchester", -2.244644, 53.483959))
+    York = graph.add_node(Node("York", -1.080278, 53.958332))
+    Liverpool = graph.add_node(Node("Liverpool", -2.983333, 53.400002))
+    Glasgow = graph.add_node(Node("Glasgow", -4.251433, 55.860916))
+    Southampton = graph.add_node(Node("Southampton", -1.404219, 50.902531))
+    Birmingham = graph.add_node(Node("Birmingham", -1.890401, 52.486244))
+    Oxford = graph.add_node(Node("Oxford", -1.257677, 51.752022))
+    Windsor = graph.add_node(Node("Windsor", -0.607558, 51.481727))
+    Carlisle = graph.add_node(Node("Carlisle", -2.944000, 54.890999))
+    Edinburgh = graph.add_node(Node("Edinburgh", -3.188267, 55.953251))
+    Leeds = graph.add_node(Node("Leeds", -1.549077, 53.800755))
+    Bristol = graph.add_node(Node("Bristol", -2.587910, 51.454514))
+    Newcastle = graph.add_node(Node("Newcastle", -1.617439, 54.978252))
 
-    print("=== BFS All ===")
-    bfs_all = graph.bfs_all(London)
-    for node in bfs_all:
-        print(node)
-    print("=== DFS All ===")
-    dfs_all = graph.dfs_all(London)
-    for node in dfs_all:
-        print(node)
-    print("=== BFS Search ===")
-    bfs_search = graph.bfs_search(Liverpool, London)
-    for node in bfs_search:
-        print(node)
-    print("=== DFS Search ===")
-    dfs_search = graph.dfs_search(Liverpool, London)
-    for node in dfs_search:
-        print(node)
+    # Connecting cities with two-way connections
+    graph.make_link(London, [Oxford, Windsor, Southampton, Bristol], [56, 25, 79, 118])
+    graph.make_link(Manchester, [Liverpool, Leeds, Carlisle, Birmingham], [35, 44, 120, 86])
+    graph.make_link(York, [Leeds, Newcastle, Birmingham], [24, 84, 132])
+    graph.make_link(Liverpool, [Manchester, Birmingham, Bristol, Carlisle], [35, 98, 177, 122])
+    graph.make_link(Glasgow, [Edinburgh, Carlisle], [47, 96])
+    graph.make_link(Southampton, [London, Oxford, Windsor, Bristol], [79, 66, 71, 64])
+    graph.make_link(Birmingham, [Oxford, Liverpool, Manchester, Leeds, York, Bristol], [85, 98, 86, 118, 132, 88])
+    graph.make_link(Oxford, [London, Birmingham, Southampton], [56, 85, 66])
+    graph.make_link(Windsor, [London, Southampton], [25, 71])
+    graph.make_link(Carlisle, [Glasgow, Newcastle, Manchester, Liverpool], [96, 60, 120, 122])
+    graph.make_link(Edinburgh, [Glasgow, Newcastle, Carlisle], [47, 121, 92])
+    graph.make_link(Leeds, [Manchester, York, Birmingham, Newcastle], [44, 24, 118, 97])
+    graph.make_link(Bristol, [London, Liverpool, Birmingham, Southampton, Oxford], [118, 177, 88, 64, 75])
+    graph.make_link(Newcastle, [Carlisle, York, Edinburgh, Leeds], [60, 84, 121, 97])
+
+
+    # print("=== BFS All ===")
+    # bfs_all = graph.bfs_all(London)
+    # for node in bfs_all:
+    #     print(node)
+    # print("=== DFS All ===")
+    # dfs_all = graph.dfs_all(London)
+    # for node in dfs_all:
+    #     print(node)
+    # print("=== BFS Search ===")
+    # bfs_search = graph.bfs_search(Liverpool, London)
+    # for node in bfs_search:
+    #     print(node)
+    # print("=== DFS Search ===")
+    # dfs_search = graph.dfs_search(Liverpool, London)
+    # for node in dfs_search:
+    #     print(node)
     print("=== Dijkstra ===")
-    dijkstra = graph.dijkstra(Liverpool, London)
-    for node in dijkstra:
+    dijkstra = graph.dijkstra(Glasgow, Southampton)
+    for node in dijkstra[0]:
         print(node)
+    print(f"Distance: {dijkstra[1]} miles")
 
     visualizer = GraphVisualizer(graph)
     visualizer.draw_graph()
